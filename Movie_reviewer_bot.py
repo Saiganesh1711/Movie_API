@@ -4,7 +4,7 @@ import telebot
 import requests
 
 # Get environment variables
-TOKEN = os.environ.get("7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM")
+TOKEN = os.environ.get("BOT_TOKEN","7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM")
 OMDB_API_KEY = os.environ.get("b7f1eaab")
 
 bot = telebot.TeleBot(TOKEN)
