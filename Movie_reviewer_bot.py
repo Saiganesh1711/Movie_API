@@ -4,6 +4,7 @@ import telebot
 
 # Your Telegram Bot Token (load from environment variable for security)
 TOKEN = os.getenv("TELEGRAM_TOKEN", "7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM")
+OMDB_API_KEY = "b7f1eaab"
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
