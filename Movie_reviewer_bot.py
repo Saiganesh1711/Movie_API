@@ -1,34 +1,47 @@
-import requests
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+import os
+from flask import Flask, request
+import telebot
 
-BOT_TOKEN = "7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM"
-OMDB_API_KEY = "b7f1eaab"
+# Your Telegram Bot Token (load from environment variable for security)
+TOKEN = os.getenv("TELEGRAM_TOKEN", "your-token-here")
+bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
-# Start command
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("🎬 Welcome to Movie Review Bot!\nSend me any movie title to get a review.")
+# Sample movie reviews dictionary
+movie_reviews = {
+    "inception": "Inception is a mind-bending thriller with stunning visuals. 9/10",
+    "avatar": "Avatar is a visually spectacular blockbuster. 8/10",
+    "titanic": "Titanic is an emotional epic with unforgettable performances. 9.5/10"
+}
 
-# Handle movie title queries
-async def get_movie_review(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    movie_title = update.message.text
-    url = f"http://www.omdbapi.com/?t={movie_title}&apikey={OMDB_API_KEY}"
-    response = requests.get(url).json()
+# Webhook endpoint
+@app.route(f"/{TOKEN}", methods=["POST"])
+def webhook():
+    update = telebot.types.Update.de_json(request.get_data(as_text=True))
+    bot.process_new_updates([update])
+    return "OK", 200
 
-    if response.get("Response") == "True":
-        title = response.get("Title")
-        year = response.get("Year")
-        rating = response.get("imdbRating")
-        plot = response.get("Plot")
-        reply = f"🎥 *{title}* ({year})\n⭐ IMDb: {rating}\n📝 {plot}"
-    else:
-        reply = "❌ Movie not found. Try a different title."
+# Command handler
+@bot.message_handler(commands=["start"])
+def send_welcome(message):
+    bot.reply_to(message, "🎬 Welcome to Movie Reviewer Bot!\nSend me the name of a movie and I'll review it.")
 
-    await update.message.reply_text(reply, parse_mode="Markdown")
+# Review handler
+@bot.message_handler(func=lambda message: True)
+def review_movie(message):
+    movie = message.text.strip().lower()
+    review = movie_reviews.get(movie, f"Sorry, I don't have a review for '{movie.title()}' yet.")
+    bot.reply_to(message, review)
 
-# Setup bot
-app = ApplicationBuilder().token(BOT_TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_movie_review))
+# Flask server entry point
+if __name__ == "__main__":
+    # Set the webhook URL (only needed once or when IP/domain changes)
+    WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # e.g., https://your-service.onrender.com
+    if WEBHOOK_URL:
+        bot.remove_webhook()
+        bot.set_webhook(url=f"{WEBHOOK_URL}/{TOKEN}")
 
-app.run_polling()
+    # Run the Flask server
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
