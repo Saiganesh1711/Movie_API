@@ -7,6 +7,11 @@ TOKEN = os.getenv("TELEGRAM_TOKEN", "7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95n
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
+
+# Start command
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("🎬 Welcome to Movie Review Bot!\nSend me any movie title to get a review.")
+
 # Sample movie reviews dictionary
 movie_reviews = {
     "inception": "Inception is a mind-bending thriller with stunning visuals. 9/10",
