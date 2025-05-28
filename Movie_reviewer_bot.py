@@ -3,7 +3,7 @@ from flask import Flask, request
 import telebot
 
 # Your Telegram Bot Token (load from environment variable for security)
-TOKEN = os.getenv("TELEGRAM_TOKEN", "your-token-here")
+TOKEN = os.getenv("TELEGRAM_TOKEN", "7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM")
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
@@ -36,7 +36,7 @@ def review_movie(message):
 # Flask server entry point
 if __name__ == "__main__":
     # Set the webhook URL (only needed once or when IP/domain changes)
-    WEBHOOK_URL = os.getenv("https://movie-api-f6k0.onrender.com/7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM")  # e.g., https://your-service.onrender.com
+    WEBHOOK_URL = os.getenv(f"https://movie-api-f6k0.onrender.com/{7773162114:AAG7jlwgMrZRhGCmRMCrXWSwsl-ez95ntuM}")  # e.g., https://your-service.onrender.com
     if WEBHOOK_URL:
         bot.remove_webhook()
         bot.set_webhook(url=f"{WEBHOOK_URL}/{TOKEN}")
